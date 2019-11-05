@@ -1,10 +1,18 @@
 FROM php:7.2-fpm
-WORKDIR /var/www
+
 # Copy composer.lock and composer.json
-COPY ./project/composer.json /var/www/
+# COPY .//composer.json /var/www/
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
+
+
+
+WORKDIR /var/www
+ 
+
+RUN apt-get update -yq && apt-get install -yq \
+    software-properties-common \
+    git \
     build-essential \
     mysql-client \
     libpng-dev \
@@ -15,8 +23,15 @@ RUN apt-get update && apt-get install -y \
     jpegoptim optipng pngquant gifsicle \
     vim \
     unzip \
-    git \
     curl
+
+
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+
+
+RUN apt-get update && apt-get install -y \
+    nodejs \
+    yarn    
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -33,8 +48,6 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN groupadd -g 1000 www
 RUN useradd -u 1000 -ms /bin/bash -g www www
 
-# Copy existing application directory contents
-COPY ./project /var/www
 
 # Copy existing application directory permissions
 COPY --chown=www:www . /var/www
